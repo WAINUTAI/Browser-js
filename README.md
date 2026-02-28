@@ -29,6 +29,8 @@ npm install
 ```bash
 npm run launch
 npm run list
+# run your browser.js task(s)
+npm run stop
 ```
 
 Or manually:
@@ -36,6 +38,8 @@ Or manually:
 ```bash
 bash ./launch-chrome.sh
 node browser.js list
+# run your task(s)
+bash ./stop-chrome.sh
 ```
 
 ## Commands
@@ -69,6 +73,16 @@ node browser.js --json list
 
 ```bash
 node compose-draft.js "name@example.com" "Subject" "Line 1\nLine 2"
+```
+
+## Cleanup (important)
+
+When your browsing task is complete, stop the headless/debug browser to free memory:
+
+```bash
+npm run stop
+# or
+bash ./stop-chrome.sh
 ```
 
 ## Notes
