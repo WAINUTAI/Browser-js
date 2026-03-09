@@ -1,22 +1,15 @@
 # Browser-js
 
-CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol).
+CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol). Works on Linux/Ubuntu and macOS/Windows.
 
-This repo now supports **Ubuntu/Linux** out of the box.
+## Features
 
-## What changed for Ubuntu
-
-- `launch-chrome.sh` now auto-detects:
-  - `google-chrome-stable`
-  - `google-chrome`
-  - `chromium-browser`
-  - `chromium`
-  - `/snap/bin/chromium`
-- Uses a dedicated debug profile (`/tmp/browser-js-chrome-profile` by default)
-- Verifies CDP endpoint is live (`http://127.0.0.1:9222/json/version`)
-- Better Gmail draft compatibility:
-  - Works with Gmail `u/0`, `u/1`, etc.
-  - Handles EN/NL labels for compose fields
+- **Auto-detect Chrome**: `google-chrome-stable`, `google-chrome`, `chromium-browser`, `chromium`, or `/snap/bin/chromium`
+- **Dedicated debug profile**: Uses `/tmp/browser-js-chrome-profile` to avoid conflicts with your regular browser
+- **CDP health check**: Verifies the debug endpoint is live before running commands
+- **Gmail draft support**: Works with Gmail's various UI versions (`u/0`, `u/1`, etc.) and handles EN/NL labels
+- **Chain commands**: Run multiple commands in sequence
+- **JSON output**: Machine-readable output for scripting
 
 ## Install
 
@@ -24,7 +17,7 @@ This repo now supports **Ubuntu/Linux** out of the box.
 npm install
 ```
 
-## Quick start (Ubuntu)
+## Quick start
 
 ```bash
 npm run launch
