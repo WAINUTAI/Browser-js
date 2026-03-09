@@ -4,12 +4,28 @@ CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol). Works on
 
 ## Features
 
+### Browser Automation
+- **Tab management**: List, open, select, close tabs
+- **Navigation**: Open URLs with load wait
+- **Element interaction**: Click by index/text/selector, type, fill inputs
+- **Content extraction**: Get page text, HTML, screenshots
+- **JavaScript execution**: Run custom JS in page context
+- **Scrolling**: Scroll up/down with pixel control
+- **Waiting**: Wait for elements to appear
+
+### Chrome Integration
 - **Auto-detect Chrome**: `google-chrome-stable`, `google-chrome`, `chromium-browser`, `chromium`, or `/snap/bin/chromium`
 - **Dedicated debug profile**: Uses `/tmp/browser-js-chrome-profile` to avoid conflicts with your regular browser
 - **CDP health check**: Verifies the debug endpoint is live before running commands
-- **Gmail draft support**: Works with Gmail's various UI versions (`u/0`, `u/1`, etc.) and handles EN/NL labels
-- **Chain commands**: Run multiple commands in sequence
-- **JSON output**: Machine-readable output for scripting
+
+### Gmail Support
+- Works with Gmail's various UI versions (`u/0`, `u/1`, etc.)
+- Handles EN/NL labels for compose fields
+
+### Scripting
+- **Chain commands**: Run multiple commands in sequence with `then`
+- **JSON output**: Machine-readable output for agent parsing
+- **Custom port**: Override CDP port (default: 9222)
 
 ## Install
 
