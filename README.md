@@ -35,6 +35,8 @@ npm install
 
 ## Quick start
 
+### Ubuntu / Linux
+
 ```bash
 npm run launch
 npm run list
@@ -49,6 +51,16 @@ bash ./launch-chrome.sh
 node browser.js list
 # run your task(s)
 bash ./stop-chrome.sh
+```
+
+### Windows
+
+```powershell
+# PowerShell
+.\launch-chrome.ps1
+node browser.js list
+# run your task(s)
+.\stop-chrome.ps1
 ```
 
 ## Commands
