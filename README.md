@@ -33,6 +33,9 @@ CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol). Works on
 - **Unicode-safe typing**: ASCII chars go through CDP keyboard events (so React/autocomplete handlers fire); em-dashes, smart quotes, accented chars, CJK, and emoji use `Input.insertText` so they land intact
 - **Platform-agnostic input clearing**: no `Ctrl+A` keystroke — clears via native value setter, so `/fill` works the same on Windows, Linux, and macOS
 
+### Claude Code skill (bundled)
+- **`.claude/skills/browsejs/SKILL.md`** — open the repo in [Claude Code](https://claude.com/claude-code) and the `browsejs` skill activates automatically. It documents all 14 endpoints and tells the agent how to bring the stack up when `/health` fails. Zero setup.
+
 ## Install
 
 ```bash
