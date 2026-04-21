@@ -36,39 +36,107 @@ CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol). Works on
 ### Claude Code skill (bundled)
 - **`.claude/skills/browsejs/SKILL.md`** — open the repo in [Claude Code](https://claude.com/claude-code) and the `browsejs` skill activates automatically. It documents all 14 endpoints and tells the agent how to bring the stack up when `/health` fails. Zero setup.
 
-## Install
+## Quick install (recommended)
+
+Two commands to a working, always-on agent-friendly setup:
 
 ```bash
 npm install
+npm run install:autostart
 ```
 
-## Quick start
-
-### Ubuntu / Linux
+That wires browser-js into your OS session. On next login (and immediately on macOS/Linux) Chrome runs on port 9222 and the HTTP server runs on port 9223. Verify:
 
 ```bash
-npm run launch
-npm run list
-# run your browser.js task(s)
-npm run stop
+curl http://127.0.0.1:9223/health
+# → {"status":"ok","cdpConnected":true,"tabCount":N}
 ```
 
-Or manually:
+If you cloned this into a Claude Code workspace, the bundled `browsejs` skill activates automatically and knows how to drive the API.
+
+### Prerequisites
+
+- **Node.js ≥ 18** — `node --version`
+- **Chrome / Chromium** installed somewhere the launcher can find it:
+  - **Linux/macOS**: `google-chrome-stable`, `google-chrome`, `chromium`, `chromium-browser`, or `/snap/bin/chromium` on `PATH`
+  - **Windows**: Program Files (x64 or x86), `%LOCALAPPDATA%\Google\Chrome\Application\`, or Canary/Beta/Dev
+  - Override with `CHROME_PATH=/path/to/chrome` on any platform
+- **PowerShell** (Windows, bundled with the OS) or **bash** (Linux/macOS)
+
+No admin/sudo required. All auto-start config lives in your user session (Startup folder / `~/Library/LaunchAgents/` / `~/.config/systemd/user/`).
+
+To uninstall the auto-start later, `npm run install:autostart` prints the exact uninstall command for your platform when you run it.
+
+## How to use (after install)
+
+Once `curl http://127.0.0.1:9223/health` returns OK, there are three ways to drive it.
+
+### A. From Claude Code (recommended for agents)
+
+Open this repo in [Claude Code](https://claude.com/claude-code). The project-scoped skill at `.claude/skills/browsejs/SKILL.md` activates automatically. Just describe what you want — the agent knows the API and how to recover the stack if 9223 goes down.
+
+### B. From any shell or HTTP client
 
 ```bash
+# List tabs
+curl -s http://127.0.0.1:9223/tabs
+
+# Open a URL
+curl -s -X POST http://127.0.0.1:9223/navigate \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://news.ycombinator.com","waitMs":2000}'
+
+# Structured page snapshot (your go-to "what is on this page" call)
+curl -s -X POST http://127.0.0.1:9223/recon \
+  -H "Content-Type: application/json" \
+  -d '{"tab":"0"}'
+
+# Click by text
+curl -s -X POST http://127.0.0.1:9223/click \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Sign in"}'
+
+# Fill a form and submit
+curl -s -X POST http://127.0.0.1:9223/fill \
+  -H "Content-Type: application/json" \
+  -d '{"fields":[{"selector":"input[name=q]","value":"hello"}],"submit":"enter"}'
+```
+
+Full endpoint reference: see [Server mode (HTTP API)](#server-mode-http-api) below.
+
+### C. From the CLI (one-shot, per invocation)
+
+```bash
+node browser.js list
+node browser.js open https://news.ycombinator.com
+node browser.js open https://example.com then content
+```
+
+Full CLI reference: `node browser.js help`. The CLI spins up a fresh CDP connection each invocation, which is slower than the HTTP API but convenient for shell scripts.
+
+## Install (manual, no auto-start)
+
+If you want to manage the stack yourself (CI, dev, or you don't want anything running at login):
+
+```bash
+npm install
+npm run start:all     # brings up Chrome (9222) + server (9223), idempotent
+npm run stop          # stops Chrome when done
+```
+
+Or script by script:
+
+```bash
+# Linux/macOS
 bash ./launch-chrome.sh
-node browser.js list
-# run your task(s)
+node ./server.js &
+# ...use it...
 bash ./stop-chrome.sh
-```
 
-### Windows
-
-```powershell
-# PowerShell
+# Windows (PowerShell)
 .\launch-chrome.ps1
-node browser.js list
-# run your task(s)
+Start-Process node server.js -WindowStyle Hidden
+# ...use it...
 .\stop-chrome.ps1
 ```
 
