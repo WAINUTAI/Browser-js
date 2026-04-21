@@ -1,2 +1,4 @@
 node_modules/
 chrome-debug-profile/
+server.log
+server.log.err

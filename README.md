@@ -28,7 +28,7 @@ CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol). Works on
 - **Custom port**: Override CDP port (default: 9222)
 
 ### HTTP server (persistent agent mode)
-- **`node browser.js serve`** runs a long-lived HTTP API on `127.0.0.1:9223`
+- **`node server.js`** (or `npm run serve`) runs a long-lived HTTP API on `127.0.0.1:9223`
 - 14 endpoints for agents: `/recon`, `/click`, `/fill`, `/read`, `/dismiss`, `/navigate`, `/eval`, `/scroll`, `/type`, `/dispatch`, `/captcha`, `/focus`, `/tabs`, `/health`
 - Chrome and the server stay open; agents come and go over plain HTTP
 - Structured `/recon` page snapshot with overlay + captcha detection built in
@@ -88,7 +88,7 @@ node browser.js fill "input[name='q']" "WAINUT"
 node browser.js evaluate "document.title"
 node browser.js search "github"          # search across all tabs
 node browser.js close-all                # close all open tabs
-node browser.js serve                    # start the persistent HTTP API (see below)
+node server.js                           # start the persistent HTTP API (see below)
 ```
 
 Full CLI reference with all commands and flags:
@@ -115,14 +115,91 @@ Start the long-running HTTP server so agents can drive Chrome over HTTP without 
 
 ```bash
 # Start Chrome first (once), then:
-node browser.js serve
+node server.js
 # or
 npm run serve
 # Bind to a different port:
-node browser.js --http-port 9300 serve
+PORT=9300 node server.js
 ```
 
 The server binds to `127.0.0.1:9223` by default and stays up until you kill it. Chrome must be reachable on `127.0.0.1:9222` (the standard launch script handles this).
+
+Env overrides: `PORT`, `CDP_HOST`, `CDP_PORT`, `BIND_HOST`.
+
+> The older `node browser.js serve` entry point still works (`npm run serve:legacy`) and is functionally identical — both paths call the same `startServer()`.
+
+## Persistent background mode (auto-start on login)
+
+If you want Chrome (9222) **and** the HTTP server (9223) to come up every time you log in — so agents never have to bootstrap the stack — use the combined launcher and wire it into your OS session.
+
+### One-shot bring-up (any platform)
+
+```bash
+npm run start:all
+```
+
+This dispatches to the platform-specific launcher (`start-browsejs.sh` on Linux/macOS, `start-browsejs.ps1` on Windows). You can also call them directly:
+
+```bash
+# Linux/macOS
+bash ./start-browsejs.sh
+
+# Windows (PowerShell)
+powershell -NoProfile -ExecutionPolicy Bypass -File .\start-browsejs.ps1
+```
+
+The launcher is idempotent:
+- If 9222 is already live → skips Chrome
+- If 9223 is already live → skips the server
+- Uses a **separate Chrome user-data-dir**, so it does not kill or hijack your normal Chrome session
+
+### Auto-start on Windows login
+
+A small shortcut in the Startup folder runs the launcher silently on each login:
+
+```powershell
+# One-time install: create the Startup shortcut
+$startup = [Environment]::GetFolderPath('Startup')
+$lnk     = Join-Path $startup 'browser-js.lnk'
+$ws      = New-Object -ComObject WScript.Shell
+$sc      = $ws.CreateShortcut($lnk)
+$sc.TargetPath       = 'wscript.exe'
+$sc.Arguments        = "`"$PWD\start-browsejs-hidden.vbs`""
+$sc.WorkingDirectory = "$PWD"
+$sc.Save()
+```
+
+`start-browsejs-hidden.vbs` wraps the PowerShell launcher with a hidden console window. To disable: delete `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\browser-js.lnk`.
+
+### Auto-start on Linux (systemd user unit, optional)
+
+Create `~/.config/systemd/user/browser-js.service`:
+
+```ini
+[Unit]
+Description=browser-js CDP + HTTP server
+After=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Browser-js
+ExecStart=/usr/bin/env bash %h/Browser-js/start-browsejs.sh
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+```
+
+Then: `systemctl --user enable --now browser-js`.
+
+### Auto-start on macOS (launchd, optional)
+
+Use `launchctl` with a `LaunchAgent` plist in `~/Library/LaunchAgents/` that runs `bash /path/to/Browser-js/start-browsejs.sh` with `RunAtLoad=true`. See Apple's `launchd.plist(5)` for the exact format.
+
+### Caveats
+
+- Auto-start fires on **login**, not boot — the stack comes up when you sign in, not while the login screen is showing.
+- The launcher does not supervise the server. If `node server.js` crashes it stays down until the next login or manual launch. For always-on use, run it under systemd / launchd / a Windows Scheduled Task with restart-on-failure.
 
 ### Endpoints
 

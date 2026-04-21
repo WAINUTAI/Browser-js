@@ -1291,3 +1291,14 @@ function startServer({ port = 9223, cdpHost = "127.0.0.1", cdpPort = 9222, bindH
 }
 
 module.exports = { startServer };
+
+// Allow running directly: `node server.js` starts the HTTP server.
+// Env overrides: PORT, CDP_HOST, CDP_PORT, BIND_HOST.
+if (require.main === module) {
+  startServer({
+    port: Number(process.env.PORT) || 9223,
+    cdpHost: process.env.CDP_HOST || "127.0.0.1",
+    cdpPort: Number(process.env.CDP_PORT) || 9222,
+    bindHost: process.env.BIND_HOST || "127.0.0.1",
+  });
+}
