@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in Browser-js! This guide covers everything you need to get started.
+Thanks for your interest in Chromepilot! This guide covers everything you need to get started.
 
 ## Prerequisites
 
@@ -12,8 +12,8 @@ Thanks for your interest in Browser-js! This guide covers everything you need to
 ## Setup
 
 ```bash
-git clone https://github.com/WAINUTAI/Browser-js.git
-cd Browser-js
+git clone https://github.com/WAINUTAI/Chromepilot.git
+cd Chromepilot
 npm install
 ```
 
@@ -35,8 +35,8 @@ npm run launch
 npm run list
 
 # Run a command
-node browser.js open https://example.com
-node browser.js content
+node chromepilot.js open https://example.com
+node chromepilot.js content
 
 # Stop Chrome when done
 npm run stop
@@ -52,7 +52,7 @@ npm run start:all
 curl -s http://127.0.0.1:9223/health
 ```
 
-If you edit `server.js` or `start-browsejs.{ps1,sh}`, restart with:
+If you edit `server.js` or `start-chromepilot.{ps1,sh}`, restart with:
 
 ```bash
 # Stop the server (pick whichever is running)
@@ -65,7 +65,7 @@ npm run start:all
 
 ## Claude Code skill
 
-`.claude/skills/browsejs/SKILL.md` is a project-scoped skill for [Claude Code](https://claude.com/claude-code). Anyone who clones the repo and opens it with Claude Code gets the `browsejs` skill out of the box — it documents the HTTP API and tells the agent how to bring the stack up if health checks fail. Keep it in sync when you add/rename endpoints in `server.js`.
+`.claude/skills/chromepilot/SKILL.md` is a project-scoped skill for [Claude Code](https://claude.com/claude-code). Anyone who clones the repo and opens it with Claude Code gets the `chromepilot` skill out of the box — it documents the HTTP API and tells the agent how to bring the stack up if health checks fail. Keep it in sync when you add/rename endpoints in `server.js`.
 
 ## Code style
 
@@ -75,4 +75,4 @@ npm run start:all
 
 ## Questions?
 
-Open an issue at [github.com/WAINUTAI/Browser-js/issues](https://github.com/WAINUTAI/Browser-js/issues).
+Open an issue at [github.com/WAINUTAI/Chromepilot/issues](https://github.com/WAINUTAI/Chromepilot/issues).

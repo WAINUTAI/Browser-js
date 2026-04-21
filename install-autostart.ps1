@@ -1,14 +1,14 @@
-# One-time install: register browser-js to auto-start at Windows login.
+# One-time install: register chromepilot to auto-start at Windows login.
 # Idempotent - overwriting the same shortcut is safe.
 
 $ErrorActionPreference = "Stop"
 
 $startup = [Environment]::GetFolderPath('Startup')
-$lnk     = Join-Path $startup 'browser-js.lnk'
-$vbs     = Join-Path $PSScriptRoot 'start-browsejs-hidden.vbs'
+$lnk     = Join-Path $startup 'chromepilot.lnk'
+$vbs     = Join-Path $PSScriptRoot 'start-chromepilot-hidden.vbs'
 
 if (-not (Test-Path $vbs)) {
-    Write-Host "Cannot find $vbs - run this from the Browser-js repo root."
+    Write-Host "Cannot find $vbs - run this from the Chromepilot repo root."
     exit 1
 }
 
@@ -17,7 +17,7 @@ $sc = $ws.CreateShortcut($lnk)
 $sc.TargetPath       = 'wscript.exe'
 $sc.Arguments        = "`"$vbs`""
 $sc.WorkingDirectory = $PSScriptRoot
-$sc.Description      = 'Auto-start browser-js CDP + HTTP server on login'
+$sc.Description      = 'Auto-start chromepilot CDP + HTTP server on login'
 $sc.Save()
 
 Write-Host "Installed: $lnk"

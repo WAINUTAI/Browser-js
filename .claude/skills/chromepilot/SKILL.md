@@ -1,13 +1,13 @@
 ---
-name: browsejs
-description: Browser automation via CDP through a persistent HTTP server on 127.0.0.1:9223. Use this skill when the user wants to drive Chrome from an agent — navigate pages, click/fill forms, read content, handle cookie banners, take structured page snapshots (/recon), or solve captchas. Also use when debugging anything on a live web page from the terminal. Requires the browser-js repo's HTTP server to be running; the skill includes the commands to bring it up if it's down.
+name: chromepilot
+description: Browser automation via CDP through a persistent HTTP server on 127.0.0.1:9223. Use this skill when the user wants to drive Chrome from an agent — navigate pages, click/fill forms, read content, handle cookie banners, take structured page snapshots (/recon), or solve captchas. Also use when debugging anything on a live web page from the terminal. Requires the chromepilot repo's HTTP server to be running; the skill includes the commands to bring it up if it's down.
 ---
 
-# BrowseJS - Browser Automation via CDP (HTTP server)
+# Chromepilot - Browser Automation via CDP (HTTP server)
 
-Control Chrome via the browser-js HTTP API on `127.0.0.1:9223`. This is the **preferred** method — the server is persistent, endpoints are structured, and one HTTP call is cheaper than spinning up a new Node process for every step.
+Control Chrome via the chromepilot HTTP API on `127.0.0.1:9223`. This is the **preferred** method — the server is persistent, endpoints are structured, and one HTTP call is cheaper than spinning up a new Node process for every step.
 
-> This skill assumes Claude Code is running from the root of the `Browser-js` repo. All script paths are relative to the repo root. If you are running Claude from elsewhere, either `cd` into the repo first or use absolute paths.
+> This skill assumes Claude Code is running from the root of the `Chromepilot` repo. All script paths are relative to the repo root. If you are running Claude from elsewhere, either `cd` into the repo first or use absolute paths.
 
 ## Architecture (two ports)
 
@@ -17,9 +17,9 @@ Control Chrome via the browser-js HTTP API on `127.0.0.1:9223`. This is the **pr
 | `9223` | `node server.js` | HTTP API the agent talks to — connects to Chrome on 9222 under the hood |
 
 Tool locations (relative to repo root):
-- **Combined launcher (preferred)**: `./start-browsejs.sh` (Linux/macOS) or `./start-browsejs.ps1` (Windows) — idempotent, starts Chrome + server, does NOT kill your normal Chrome
+- **Combined launcher (preferred)**: `./start-chromepilot.sh` (Linux/macOS) or `./start-chromepilot.ps1` (Windows) — idempotent, starts Chrome + server, does NOT kill your normal Chrome
 - **HTTP server**: `./server.js`
-- **CLI (fallback only)**: `./browser.js`
+- **CLI (fallback only)**: `./chromepilot.js`
 - **Auto-start**: see README "Persistent background mode" — if set up, both ports are live from login onward
 
 ## Prerequisites
@@ -38,10 +38,10 @@ One call brings up whatever is missing (Chrome on 9222, server on 9223, or both)
 
 ```bash
 # Linux/macOS
-bash ./start-browsejs.sh
+bash ./start-chromepilot.sh
 
 # Windows
-powershell -NoProfile -ExecutionPolicy Bypass -File .\start-browsejs.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\start-chromepilot.ps1
 ```
 
 This is the **preferred** recovery path. The launcher does NOT kill your normal Chrome — it uses a separate `--user-data-dir` so the debug Chrome runs alongside it. Server output goes to `server.log` in the repo folder for debugging.
@@ -173,8 +173,8 @@ curl -s http://127.0.0.1:9223/health
 
 - If `cdpConnected:true` → ready, proceed.
 - Anything else → run the combined launcher (fixes Chrome + server in one go):
-  - Linux/macOS: `bash ./start-browsejs.sh`
-  - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File .\start-browsejs.ps1`
+  - Linux/macOS: `bash ./start-chromepilot.sh`
+  - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File .\start-chromepilot.ps1`
 
 ### 2. Prefer `/recon` over screenshots
 
@@ -208,8 +208,8 @@ Summarize what you found, don't dump raw JSON. When reporting navigation outcome
 If the HTTP server refuses to start and you need something done immediately, you can still drive the CLI directly:
 
 ```bash
-node ./browser.js list
-node ./browser.js open https://example.com then content
+node ./chromepilot.js list
+node ./chromepilot.js open https://example.com then content
 ```
 
 The CLI spins up a fresh CDP connection for every command, which is slower and loses structured output. Use only as a fallback.

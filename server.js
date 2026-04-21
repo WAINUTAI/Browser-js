@@ -1,5 +1,5 @@
 /**
- * server.js — Persistent HTTP server for browser-js
+ * server.js — Persistent HTTP server for chromepilot
  *
  * Exposes browser control over HTTP on 127.0.0.1:9223 (default).
  * Chrome must be reachable on 127.0.0.1:9222 (CDP debug endpoint).
@@ -548,7 +548,7 @@ const READ_JS = `
     resultText = (resultEl.innerText || '').trim().substring(0, 5000);
   }
 
-  // Plain text fallback via shadow-DOM-aware walker (reused from browser.js content)
+  // Plain text fallback via shadow-DOM-aware walker (reused from chromepilot.js content)
   function getTextDeep(r) {
     let text = '';
     if (r.cloneNode && !(r instanceof ShadowRoot)) {
@@ -1176,7 +1176,7 @@ function makeHandlers(opts) {
 // to depth 5 to find the frame that actually holds Audio/Restart/Submit
 // controls, then runs the requested action. Frame-discovery + Arkose/hCaptcha
 // aria-label selectors adapted from MIT-licensed work by AllAboutAI-YT — see
-// NOTICE. reCAPTCHA ID selectors (#recaptcha-*-button) added by browser-js.
+// NOTICE. reCAPTCHA ID selectors (#recaptcha-*-button) added by chromepilot.
 function captchaScript(action) {
   return `
     (function(action) {
@@ -1274,7 +1274,7 @@ function startServer({ port = 9223, cdpHost = "127.0.0.1", cdpPort = 9222, bindH
   });
 
   server.listen(port, bindHost, () => {
-    console.log(`browser-js HTTP server listening on http://${bindHost}:${port}`);
+    console.log(`chromepilot HTTP server listening on http://${bindHost}:${port}`);
     console.log(`CDP target: ${cdpHost}:${cdpPort}`);
     console.log(`Endpoints: /recon /click /fill /read /dismiss /navigate /eval /scroll /type /dispatch /captcha /focus /tabs /health`);
   });

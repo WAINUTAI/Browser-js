@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Cross-platform dispatcher: install browser-js as a login auto-start.
+// Cross-platform dispatcher: install chromepilot as a login auto-start.
 // Delegates to install-autostart.ps1 (Windows) or install-autostart.sh (Linux/macOS).
 const { spawnSync } = require("child_process");
 const { join } = require("path");

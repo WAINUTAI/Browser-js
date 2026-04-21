@@ -2,12 +2,12 @@
 set -euo pipefail
 
 # Cross-platform launcher with Ubuntu/Linux focus.
-# Starts Chrome/Chromium with CDP enabled for browser.js.
+# Starts Chrome/Chromium with CDP enabled for chromepilot.js.
 
 DEBUG_PORT="${DEBUG_PORT:-9222}"
-DEBUG_PROFILE="${DEBUG_PROFILE:-/tmp/browser-js-chrome-profile}"
+DEBUG_PROFILE="${DEBUG_PROFILE:-/tmp/chromepilot-chrome-profile}"
 CHROME_PATH="${CHROME_PATH:-}"
-LOG_FILE="${LOG_FILE:-/tmp/browser-js-chrome.log}"
+LOG_FILE="${LOG_FILE:-/tmp/chromepilot-chrome.log}"
 
 is_cdp_live() {
   curl -fsS "http://127.0.0.1:${DEBUG_PORT}/json/version" >/dev/null 2>&1

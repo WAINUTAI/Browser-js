@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * browser.js - Optimized CLI to control Chrome via CDP
+ * chromepilot.js - Optimized CLI to control Chrome via CDP
  *
  * Single file. One CDP connection per invocation. Chainable commands.
  * Smart element finding by text. JSON output for agents.
@@ -30,10 +30,10 @@
  *   close-all                         Close all open tabs
  *   serve                             Start persistent HTTP server (default port 9223)
  *
- * Chain commands:    node browser.js open https://hn.com then elements
- * JSON output:       node browser.js --json list
- * Target tab:        node browser.js --tab 1 content
- * Custom port:       node browser.js --port 9333 list
+ * Chain commands:    node chromepilot.js open https://hn.com then elements
+ * JSON output:       node chromepilot.js --json list
+ * Target tab:        node chromepilot.js --tab 1 content
+ * Custom port:       node chromepilot.js --port 9333 list
  */
 
 const CDP = require("chrome-remote-interface");
@@ -659,9 +659,9 @@ function parseArgs(argv) {
 
 function printHelp() {
   console.log(`
-browser.js — Control Chrome via CDP (optimized single-file CLI)
+chromepilot.js — Control Chrome via CDP (optimized single-file CLI)
 
-Usage:  node browser.js [flags] <command> [args] [then <command> [args] ...]
+Usage:  node chromepilot.js [flags] <command> [args] [then <command> [args] ...]
 
 Commands:
   list                              List all open tabs
@@ -692,13 +692,13 @@ Flags:
   --http-port <n> HTTP server port for 'serve' (default: 9223)
 
 Chain commands with "then":
-  node browser.js open https://hn.com then content
-  node browser.js open https://hn.com then elements then click 5
-  node browser.js --json open https://hn.com then elements
+  node chromepilot.js open https://hn.com then content
+  node chromepilot.js open https://hn.com then elements then click 5
+  node chromepilot.js --json open https://hn.com then elements
 
 Smart click (no need to run elements first):
-  node browser.js click-text "Sign In"
-  node browser.js click-selector "#submit-btn"
+  node chromepilot.js click-text "Sign In"
+  node chromepilot.js click-selector "#submit-btn"
 `);
 }
 

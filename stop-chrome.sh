@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Stop Browser-js Chrome/Chromium instance to free memory.
+# Stop Chromepilot Chrome/Chromium instance to free memory.
 
 DEBUG_PORT="${DEBUG_PORT:-9222}"
-DEBUG_PROFILE="${DEBUG_PROFILE:-/tmp/browser-js-chrome-profile}"
+DEBUG_PROFILE="${DEBUG_PROFILE:-/tmp/chromepilot-chrome-profile}"
 
 is_cdp_live() {
   curl -fsS "http://127.0.0.1:${DEBUG_PORT}/json/version" >/dev/null 2>&1
@@ -16,7 +16,7 @@ collect_pids() {
       pid=$1;
       $1="";
       cmd=substr($0,2);
-      if ((index(cmd, "chrome") || index(cmd, "chromium")) && (index(cmd, p) || index(cmd, prof) || index(cmd, "browser-js-chrome-profile"))) {
+      if ((index(cmd, "chrome") || index(cmd, "chromium")) && (index(cmd, p) || index(cmd, prof) || index(cmd, "chromepilot-chrome-profile"))) {
         print pid;
       }
     }
@@ -32,11 +32,11 @@ if [[ ${#pids[@]} -eq 0 ]]; then
 fi
 
 if [[ ${#pids[@]} -eq 0 ]]; then
-  echo "No Browser-js Chrome process found."
+  echo "No Chromepilot Chrome process found."
   exit 0
 fi
 
-echo "Stopping Browser-js Chrome process(es): ${pids[*]}"
+echo "Stopping Chromepilot Chrome process(es): ${pids[*]}"
 kill -TERM "${pids[@]}" 2>/dev/null || true
 
 for _ in {1..10}; do
@@ -68,4 +68,4 @@ if is_cdp_live; then
   exit 1
 fi
 
-echo "Browser-js Chrome stopped. Memory freed."
+echo "Chromepilot Chrome stopped. Memory freed."

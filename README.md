@@ -1,4 +1,4 @@
-# Browser-js
+# Chromepilot
 
 CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol). Works on Linux/Ubuntu and macOS/Windows.
 
@@ -15,7 +15,7 @@ CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol). Works on
 
 ### Chrome Integration
 - **Auto-detect Chrome**: `google-chrome-stable`, `google-chrome`, `chromium-browser`, `chromium`, or `/snap/bin/chromium`
-- **Dedicated debug profile** to avoid conflicts with your regular browser: `/tmp/browser-js-chrome-profile` on Linux/macOS, `<repo>/chrome-debug-profile` on Windows
+- **Dedicated debug profile** to avoid conflicts with your regular browser: `/tmp/chromepilot-chrome-profile` on Linux/macOS, `<repo>/chrome-debug-profile` on Windows
 - **CDP health check**: Verifies the debug endpoint is live before running commands
 
 ### Scripting
@@ -34,7 +34,7 @@ CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol). Works on
 - **Platform-agnostic input clearing**: no `Ctrl+A` keystroke — clears via native value setter, so `/fill` works the same on Windows, Linux, and macOS
 
 ### Claude Code skill (bundled)
-- **`.claude/skills/browsejs/SKILL.md`** — open the repo in [Claude Code](https://claude.com/claude-code) and the `browsejs` skill activates automatically. It documents all 14 endpoints and tells the agent how to bring the stack up when `/health` fails. Zero setup.
+- **`.claude/skills/chromepilot/SKILL.md`** — open the repo in [Claude Code](https://claude.com/claude-code) and the `chromepilot` skill activates automatically. It documents all 14 endpoints and tells the agent how to bring the stack up when `/health` fails. Zero setup.
 
 ## Quick install (recommended)
 
@@ -45,14 +45,14 @@ npm install
 npm run install:autostart
 ```
 
-That wires browser-js into your OS session. On next login (and immediately on macOS/Linux) Chrome runs on port 9222 and the HTTP server runs on port 9223. Verify:
+That wires chromepilot into your OS session. On next login (and immediately on macOS/Linux) Chrome runs on port 9222 and the HTTP server runs on port 9223. Verify:
 
 ```bash
 curl http://127.0.0.1:9223/health
 # → {"status":"ok","cdpConnected":true,"tabCount":N}
 ```
 
-If you cloned this into a Claude Code workspace, the bundled `browsejs` skill activates automatically and knows how to drive the API.
+If you cloned this into a Claude Code workspace, the bundled `chromepilot` skill activates automatically and knows how to drive the API.
 
 ### Prerequisites
 
@@ -73,7 +73,7 @@ Once `curl http://127.0.0.1:9223/health` returns OK, there are three ways to dri
 
 ### A. From Claude Code (recommended for agents)
 
-Open this repo in [Claude Code](https://claude.com/claude-code). The project-scoped skill at `.claude/skills/browsejs/SKILL.md` activates automatically. Just describe what you want — the agent knows the API and how to recover the stack if 9223 goes down.
+Open this repo in [Claude Code](https://claude.com/claude-code). The project-scoped skill at `.claude/skills/chromepilot/SKILL.md` activates automatically. Just describe what you want — the agent knows the API and how to recover the stack if 9223 goes down.
 
 ### B. From any shell or HTTP client
 
@@ -107,12 +107,12 @@ Full endpoint reference: see [Server mode (HTTP API)](#server-mode-http-api) bel
 ### C. From the CLI (one-shot, per invocation)
 
 ```bash
-node browser.js list
-node browser.js open https://news.ycombinator.com
-node browser.js open https://example.com then content
+node chromepilot.js list
+node chromepilot.js open https://news.ycombinator.com
+node chromepilot.js open https://example.com then content
 ```
 
-Full CLI reference: `node browser.js help`. The CLI spins up a fresh CDP connection each invocation, which is slower than the HTTP API but convenient for shell scripts.
+Full CLI reference: `node chromepilot.js help`. The CLI spins up a fresh CDP connection each invocation, which is slower than the HTTP API but convenient for shell scripts.
 
 ## Install (manual, no auto-start)
 
@@ -143,37 +143,37 @@ Start-Process node server.js -WindowStyle Hidden
 ## Commands
 
 ```bash
-node browser.js list
-node browser.js open https://news.ycombinator.com
-node browser.js elements
-node browser.js click 0
-node browser.js click-text "Sign in"
-node browser.js click-selector "button[type='submit']"
-node browser.js content
-node browser.js screenshot page.png
-node browser.js fill "input[name='q']" "WAINUT"
-node browser.js evaluate "document.title"
-node browser.js search "github"          # search across all tabs
-node browser.js close-all                # close all open tabs
+node chromepilot.js list
+node chromepilot.js open https://news.ycombinator.com
+node chromepilot.js elements
+node chromepilot.js click 0
+node chromepilot.js click-text "Sign in"
+node chromepilot.js click-selector "button[type='submit']"
+node chromepilot.js content
+node chromepilot.js screenshot page.png
+node chromepilot.js fill "input[name='q']" "WAINUT"
+node chromepilot.js evaluate "document.title"
+node chromepilot.js search "github"          # search across all tabs
+node chromepilot.js close-all                # close all open tabs
 node server.js                           # start the persistent HTTP API (see below)
 ```
 
 Full CLI reference with all commands and flags:
 
 ```bash
-node browser.js help
+node chromepilot.js help
 ```
 
 ### Chain commands
 
 ```bash
-node browser.js open https://news.ycombinator.com then content
+node chromepilot.js open https://news.ycombinator.com then content
 ```
 
 ### JSON mode
 
 ```bash
-node browser.js --json list
+node chromepilot.js --json list
 ```
 
 ## Server mode (HTTP API)
@@ -193,7 +193,7 @@ The server binds to `127.0.0.1:9223` by default and stays up until you kill it. 
 
 Env overrides: `PORT`, `CDP_HOST`, `CDP_PORT`, `BIND_HOST`.
 
-> The older `node browser.js serve` entry point still works (`npm run serve:legacy`) and is functionally identical — both paths call the same `startServer()`.
+> The older `node chromepilot.js serve` entry point still works (`npm run serve:legacy`) and is functionally identical — both paths call the same `startServer()`.
 
 ## Persistent background mode (auto-start on login)
 
@@ -205,7 +205,7 @@ If you want Chrome (9222) **and** the HTTP server (9223) to come up every time y
 npm run start:all
 ```
 
-This dispatches to the platform-specific launcher (`start-browsejs.sh` on Linux/macOS, `start-browsejs.ps1` on Windows) and is idempotent:
+This dispatches to the platform-specific launcher (`start-chromepilot.sh` on Linux/macOS, `start-chromepilot.ps1` on Windows) and is idempotent:
 - If 9222 is already live → skips Chrome
 - If 9223 is already live → skips the server
 - Uses a **separate Chrome user-data-dir**, so it does not kill or hijack your normal Chrome session
@@ -222,9 +222,9 @@ This wires the stack into your OS session so Chrome (9222) and the HTTP server (
 
 | Platform | What it writes | Supervisor |
 |---|---|---|
-| **Windows** | Shortcut in `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\browser-js.lnk` → runs `start-browsejs-hidden.vbs` with a hidden console | No (starts at login only) |
-| **macOS** | `~/Library/LaunchAgents/com.wainut.browserjs.plist` — loads and starts immediately | launchd relaunches on crash |
-| **Linux** | `~/.config/systemd/user/browser-js.service` — enables and starts immediately | systemd restarts on failure |
+| **Windows** | Shortcut in `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\chromepilot.lnk` → runs `start-chromepilot-hidden.vbs` with a hidden console | No (starts at login only) |
+| **macOS** | `~/Library/LaunchAgents/com.wainut.chromepilot.plist` — loads and starts immediately | launchd relaunches on crash |
+| **Linux** | `~/.config/systemd/user/chromepilot.service` — enables and starts immediately | systemd restarts on failure |
 
 Run it once per machine. Safe to re-run. The installer prints the exact uninstall command for your platform.
 
@@ -343,7 +343,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, workflow, and testing guide.
 
 This project is licensed under the [Apache License 2.0](LICENSE). See NOTICE for required attribution.
 
-WAINUT and Browser-js are trademarks of WAINUT B.V. The Apache License 2.0 does not grant permission to use these names, trademarks, or branding to imply endorsement of derivative works. Forks and derivative works must retain the NOTICE file as required by the license.
+WAINUT and Chromepilot are trademarks of WAINUT B.V. The Apache License 2.0 does not grant permission to use these names, trademarks, or branding to imply endorsement of derivative works. Forks and derivative works must retain the NOTICE file as required by the license.
 
 ## About WAINUT
 

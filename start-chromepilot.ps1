@@ -1,4 +1,4 @@
-# Idempotent launcher for the full browser-js stack:
+# Idempotent launcher for the full chromepilot stack:
 #   - Chrome with CDP on port 9222 (via launch-chrome.ps1 - auto-detects Chrome)
 #   - HTTP server on port 9223 (node server.js)
 # Safe to run multiple times. Safe to run at Windows login.
