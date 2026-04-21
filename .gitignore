@@ -1,4 +1,6 @@
 node_modules/
 chrome-debug-profile/
+screenshots/
 server.log
 server.log.err
+.claude/settings.local.json

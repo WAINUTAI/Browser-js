@@ -25,7 +25,7 @@ CLI tool to control Chrome/Chromium via CDP (Chrome DevTools Protocol). Works on
 
 ### HTTP server (persistent agent mode)
 - **`node server.js`** (or `npm run serve`) runs a long-lived HTTP API on `127.0.0.1:9223`
-- 14 endpoints for agents: `/recon`, `/click`, `/fill`, `/read`, `/dismiss`, `/navigate`, `/eval`, `/scroll`, `/type`, `/dispatch`, `/captcha`, `/focus`, `/tabs`, `/health`
+- 16 endpoints for agents: `/recon`, `/click`, `/mouse-click`, `/fill`, `/read`, `/dismiss`, `/navigate`, `/eval`, `/scroll`, `/type`, `/dispatch`, `/captcha`, `/screenshot`, `/focus`, `/tabs`, `/health`
 - Chrome and the server stay open; agents come and go over plain HTTP
 - Structured `/recon` page snapshot with overlay + captcha detection built in
 - **Notification prompts auto-blocked**: `Notification.requestPermission`, `PushManager.subscribe`, and `navigator.permissions.query({name:"notifications"})` are all overridden to return `denied` on every tab the server touches — site-level "allow notifications" popups never appear
@@ -250,6 +250,7 @@ All POST bodies are JSON. The `tab` field accepts a numeric index (`"0"`, `"1"`)
 | POST | `/recon`    | `{url?, tab?, waitMs?, keepTab?}` | Full page snapshot: elements, forms, overlays, captchas, meta, landmarks |
 | POST | `/navigate` | `{tab?, url?, back?, forward?, waitMs?}` | Navigate, go back/forward |
 | POST | `/click`    | `{tab?, selector?, text?, index?, waitAfter?}` | Click by selector, fuzzy text, or index |
+| POST | `/mouse-click` | `{tab?, selector?, x?, y?, button?, clickCount?, waitAfter?}` | Trusted CDP click (`isTrusted=true`). Use when `/click` fails because a site's React/Vue handlers reject synthetic events. Pass a selector OR raw `{x,y}` coordinates. |
 | POST | `/fill`     | `{tab?, fields:[{selector,value}], submit?}` | Fill text / date / time / checkbox / radio / select / contenteditable. `submit`: `"enter"` \| `"form"` \| `"auto"` \| CSS selector. Unicode-safe. |
 | POST | `/read`     | `{tab?, selector?}` | Structured sections (headings/tables/lists/code) + plaintext |
 | POST | `/dismiss`  | `{tab?}` | Close cookie banners / modals — multi-language patterns, walks shadow DOM + cross-origin consent iframes (Sourcepoint, OneTrust, Didomi, Cookiebot, …) |
@@ -257,6 +258,7 @@ All POST bodies are JSON. The `tab` field accepts a numeric index (`"0"`, `"1"`)
 | POST | `/type`     | `{tab?, keys, submit?}` | Raw CDP key input (no focus/clear). `submit`: `"enter"` \| `"tab"` |
 | POST | `/dispatch` | `{tab?, selector, event, eventInit?, reactDebug?}` | Fire native DOM events. `reactDebug:true` returns `__reactProps` handler chain for inspection |
 | POST | `/captcha`  | `{tab?, action}` | `detect`/`read`/`next`/`prev`/`submit`/`audio`/`restart`. Works on reCAPTCHA (id-based) and Arkose/hCaptcha (aria-label-based); walks cross-origin captcha iframes |
+| POST | `/screenshot` | `{tab?, format?, quality?, fullPage?, clip?, savePath?}` | Save a PNG/JPEG of the page to disk and return its path. `format`: `"png"` (default) or `"jpeg"`. `clip:{x,y,width,height,scale?}` for a region. Default path: `screenshots/screenshot-<ISO>.<ext>` next to `server.js`. |
 | POST | `/focus`    | `{tab?}` | Bring tab to front |
 | POST | `/eval`     | `{tab?, expression}` | Run JS in page context |
 

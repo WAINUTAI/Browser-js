@@ -13,6 +13,8 @@
  */
 
 const http = require("http");
+const fs = require("fs");
+const path = require("path");
 const CDP = require("chrome-remote-interface");
 
 // ─── Tiny HTTP helpers ──────────────────────────────────────────────────────
@@ -905,6 +907,77 @@ function makeHandlers(opts) {
         const w = Math.max(0, parseInt(waitAfter, 10) || 0);
         if (w) await evalJS(client, `new Promise(r => setTimeout(r, ${w}))`);
         return { success: true, clicked: `${res.tag}: ${res.clicked}`, mode: res.mode };
+      });
+    },
+
+    // Trusted CDP mouse click — produces isTrusted=true events.
+    // Use this when /click (DOM-level el.click()) fails because a site's
+    // React/Vue/etc. handlers only respond to real user input. Examples:
+    // LinkedIn share composer, strict React-Aria components, some auth flows.
+    "POST /mouse-click": async (body) => {
+      const { tab, selector, x, y, button = "left", clickCount = 1, waitAfter = 800 } = body;
+      if (selector === undefined && (x === undefined || y === undefined))
+        throw new Error("Provide 'selector', or both 'x' and 'y'");
+
+      return withClient(tab, cdpHost, cdpPort, async (client) => {
+        let cx, cy, meta = null;
+        if (selector !== undefined) {
+          const res = await evalJS(client, `
+            (() => {
+              const el = document.querySelector(${JSON.stringify(selector)});
+              if (!el) return { error: 'No element matches selector: ' + ${JSON.stringify(selector)} };
+              if (el.disabled || el.getAttribute('aria-disabled') === 'true') return { error: 'Element is disabled' };
+              el.scrollIntoView({ block: 'center', inline: 'center' });
+              const r = el.getBoundingClientRect();
+              return { x: r.x + r.width/2, y: r.y + r.height/2, tag: el.tagName, text: (el.innerText||el.textContent||'').trim().substring(0,80) };
+            })()
+          `);
+          if (res.error) return { success: false, error: res.error };
+          cx = res.x; cy = res.y; meta = { tag: res.tag, text: res.text };
+        } else {
+          cx = Number(x); cy = Number(y);
+        }
+        await client.Input.dispatchMouseEvent({ type: "mouseMoved", x: cx, y: cy, button: "none" });
+        await client.Input.dispatchMouseEvent({ type: "mousePressed", x: cx, y: cy, button, buttons: 1, clickCount });
+        await client.Input.dispatchMouseEvent({ type: "mouseReleased", x: cx, y: cy, button, buttons: 0, clickCount });
+        const w = Math.max(0, parseInt(waitAfter, 10) || 0);
+        if (w) await evalJS(client, `new Promise(r => setTimeout(r, ${w}))`);
+        return { success: true, x: cx, y: cy, ...(meta || {}) };
+      });
+    },
+
+    // Capture a PNG/JPEG of the page. Default: saves to
+    // <server.js dir>/screenshots/screenshot-<ISO>.<ext> and returns the path
+    // (the caller — usually an LLM with file-read — opens it from disk rather
+    // than receiving MB of base64 inline). Pass savePath to override, fullPage
+    // to capture beyond the viewport, or clip={x,y,width,height} for a region.
+    "POST /screenshot": async (body) => {
+      const { tab, format = "png", quality = 80, fullPage = false, clip, savePath } = body;
+      if (!["png", "jpeg"].includes(format)) throw new Error("format must be 'png' or 'jpeg'");
+      return withClient(tab, cdpHost, cdpPort, async (client) => {
+        const params = { format, captureBeyondViewport: !!fullPage };
+        if (format === "jpeg") params.quality = Math.max(0, Math.min(100, parseInt(quality, 10) || 80));
+        if (clip && typeof clip === "object") {
+          const { x, y, width, height, scale = 1 } = clip;
+          if ([x, y, width, height].some((v) => typeof v !== "number")) {
+            throw new Error("clip must have numeric x, y, width, height");
+          }
+          params.clip = { x, y, width, height, scale };
+        }
+        const { data } = await client.Page.captureScreenshot(params);
+        const buf = Buffer.from(data, "base64");
+        let outPath;
+        if (savePath) {
+          outPath = path.isAbsolute(savePath) ? savePath : path.resolve(process.cwd(), savePath);
+        } else {
+          const dir = path.join(__dirname, "screenshots");
+          fs.mkdirSync(dir, { recursive: true });
+          const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+          outPath = path.join(dir, `screenshot-${stamp}.${format === "jpeg" ? "jpg" : "png"}`);
+        }
+        fs.mkdirSync(path.dirname(outPath), { recursive: true });
+        fs.writeFileSync(outPath, buf);
+        return { path: outPath, sizeBytes: buf.length, format };
       });
     },
 
